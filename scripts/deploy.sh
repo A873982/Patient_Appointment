@@ -36,9 +36,9 @@ gcloud auth configure-docker gcr.io --quiet
 echo "Pushing image to GCR (${GCR_IMAGE_URI})..."
 docker push ${GCR_IMAGE_URI}
 
-echo "Done! The image can now be deployed to Cloud Run."
-echo "Deployment example:"
-echo "gcloud run deploy patient-appointment --image ${IMAGE_URI_USER} \\"
-echo "  --region ${REGION} \\"
-echo "  --set-env-vars GEMINI_API_KEY=your_key_here,MYSQL_HOST=localhost,MYSQL_USER=root,MYSQL_PASSWORD=password,MYSQL_DATABASE=patientappointment \\"
-echo "  --allow-unauthenticated"
+echo "Deploying to Cloud Run..."
+gcloud run deploy patient-appointment \
+  --image ${IMAGE_URI_USER} \
+  --region ${REGION}
+  
+echo "Deployment successful! Your app is live."
