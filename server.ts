@@ -9,21 +9,29 @@ import { SecurityUtils } from './utils/securityUtils';
 dotenv.config();
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
 
-// MySQL connection pool
-const pool = mysql.createPool({
-  host: process.env.MYSQL_HOST || '',
+const dbConfig: mysql.PoolOptions = {
   user: process.env.MYSQL_USER || '',
   password: process.env.MYSQL_PASSWORD || '',
   database: process.env.MYSQL_DATABASE || 'patientappointment',
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
-});
+};
+
+// Use Unix socket if provided (Cloud Run to Cloud SQL), otherwise use host (local)
+if (process.env.INSTANCE_UNIX_SOCKET) {
+  dbConfig.socketPath = process.env.INSTANCE_UNIX_SOCKET;
+} else {
+  dbConfig.host = process.env.MYSQL_HOST || 'localhost';
+}
+
+// MySQL connection pool
+const pool = mysql.createPool(dbConfig);
 
 async function initDatabase() {
   const connection = await pool.getConnection();
